@@ -81,12 +81,15 @@ class SipsClient
 
         $sealCalculator = new JsonSealCalculator();
         $sealCalculator->calculateSeal($paymentRequest, $this->secretKey);
-        $json = json_encode($paymentRequest->toArray());
+        
+        // Add JSON encoding options to handle special characters
+        $json = json_encode($paymentRequest->toArray(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $this->lastRequestAsJson = $json;
+        
         $client = new Client(["base_uri" => $this->environment->getEnvironment()]);
         $headers = [
-            "Content-Type" => "application/json",
-            "Accept" => "application/json",
+            "Content-Type" => "application/json; charset=UTF-8",
+            "Accept" => "application/json; charset=UTF-8",
         ];
         $request = new Request("POST", $paymentRequest->getServiceUrl(), $headers, $json);
         $response = $client->send($request);
