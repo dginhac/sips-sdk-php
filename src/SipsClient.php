@@ -86,12 +86,21 @@ class SipsClient
         $json = json_encode($paymentRequest->toArray(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         $this->lastRequestAsJson = $json;
         
-        $client = new Client(["base_uri" => $this->environment->getEnvironment()]);
+        $client = new Client([
+            "base_uri" => $this->environment->getEnvironment(),
+            "headers" => [
+                "Content-Type" => "application/json; charset=UTF-8",
+                "Accept" => "application/json; charset=UTF-8",
+            ]
+        ]);
         $headers = [
             "Content-Type" => "application/json; charset=UTF-8",
-            "Accept" => "application/json; charset=UTF-8",
+            "Accept" => "application/json",
         ];
-        $request = new Request("POST", $paymentRequest->getServiceUrl(), $headers, $json);
+        $request = new Request("POST", $paymentRequest->getServiceUrl(), [
+            "Content-Type" => "application/json; charset=UTF-8",
+            "Accept" => "application/json",
+        ], $json);
         $response = $client->send($request);
         $this->lastResponseAsJson = $response->getBody()->getContents();
         $initialisationResponse = new InitializationResponse(json_decode($this->lastResponseAsJson, true));
